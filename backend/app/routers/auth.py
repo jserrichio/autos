@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_current_admin_user, get_current_user, get_db
+from app.core.deps import get_current_user, get_db
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models import User
 from app.schemas import Token, UserCreate, UserOut
@@ -26,11 +26,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 
 @router.post("/register", response_model=UserOut)
-def register(
-    user_in: UserCreate,
-    db: Session = Depends(get_db),
-    _admin: User = Depends(get_current_admin_user),
-):
+def register(user_in: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.username == user_in.username).first()
     if existing is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario ya existe")

@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import FuelLogFormPage from "./pages/FuelLogFormPage";
 import LoginPage from "./pages/LoginPage";
 import MaintenanceTaskFormPage from "./pages/MaintenanceTaskFormPage";
+import RegisterPage from "./pages/RegisterPage";
 import VehicleDetailPage from "./pages/VehicleDetailPage";
 import VehicleFormPage from "./pages/VehicleFormPage";
 import VehicleListPage from "./pages/VehicleListPage";
@@ -29,6 +30,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/registro" element={<RegisterPage />} />
           <Route element={<ProtectedLayout />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/vehiculos" element={<VehicleListPage />} />
