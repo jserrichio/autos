@@ -13,17 +13,7 @@ services:
   web:
     build: ./frontend
     restart: unless-stopped
-    environment:
-      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - caddy_data:/data
-      - caddy_config:/config
+      - "${WEB_PORT:-8091}:80"
     depends_on:
       - backend
-
-volumes:
-  caddy_data:
-  caddy_config:
