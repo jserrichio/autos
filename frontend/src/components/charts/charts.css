@@ -1,0 +1,50 @@
+:root {
+  --chart-series-1: #2a78d6;
+  --chart-series-2: #1baf7a;
+  --chart-surface: #fcfcfb;
+  --chart-text: #52514e;
+  --chart-muted: #898781;
+  --chart-grid: #e1e0d9;
+  --chart-baseline: #c3c2b7;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --chart-series-1: #3987e5;
+    --chart-series-2: #199e70;
+    --chart-surface: #1a1a19;
+    --chart-text: #c3c2b7;
+    --chart-muted: #898781;
+    --chart-grid: #2c2c2a;
+    --chart-baseline: #383835;
+  }
+}
+
+.chart-bar {
+  transition: opacity 0.1s ease;
+}
+
+.chart-bar:hover {
+  opacity: 0.8;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--chart-text);
+  margin-bottom: 0.5rem;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chart-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
