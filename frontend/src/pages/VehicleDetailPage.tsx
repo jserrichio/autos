@@ -167,7 +167,7 @@ export default function VehicleDetailPage() {
       {tasks.length === 0 ? (
         <p>No hay tareas de mantenimiento registradas todavía.</p>
       ) : (
-        <table>
+        <table className="rtable">
           <thead>
             <tr>
               <th>Fecha</th>
@@ -182,17 +182,21 @@ export default function VehicleDetailPage() {
           <tbody>
             {tasks.map((t) => (
               <tr key={t.id}>
-                <td>{t.fecha}</td>
-                <td>{tipoLabel(t.tipo, t.tipo_otro_texto)}</td>
-                <td>{t.kilometraje.toLocaleString("es-AR")} km</td>
-                <td>{t.costo ? `$${Number(t.costo).toLocaleString("es-AR")}` : "-"}</td>
-                <td>{t.taller_nombre || "-"}</td>
-                <td>{t.attachments.length}</td>
-                <td>
-                  <Link to={`/vehiculos/${vehicle.id}/tareas/${t.id}/editar`}>Editar</Link>
-                  {" · "}
+                <td data-label="Fecha">{t.fecha}</td>
+                <td data-label="Tipo">{tipoLabel(t.tipo, t.tipo_otro_texto)}</td>
+                <td data-label="Km">{t.kilometraje.toLocaleString("es-AR")} km</td>
+                <td data-label="Costo">{t.costo ? `$${Number(t.costo).toLocaleString("es-AR")}` : "-"}</td>
+                <td data-label="Taller">{t.taller_nombre || "-"}</td>
+                <td data-label="Adjuntos" className="hide-mobile">
+                  {t.attachments.length}
+                </td>
+                <td className="actions-cell">
+                  <Link to={`/vehiculos/${vehicle.id}/tareas/${t.id}/editar`} className="action-btn">
+                    Editar
+                  </Link>
                   <a
                     href="#"
+                    className="action-btn danger"
                     onClick={(e) => {
                       e.preventDefault();
                       handleDeleteTask(t.id);
@@ -231,7 +235,7 @@ export default function VehicleDetailPage() {
               <strong>Consumo promedio:</strong> {consumoPromedio.toLocaleString("es-AR")} km/l
             </p>
           )}
-          <table>
+          <table className="rtable">
             <thead>
               <tr>
                 <th>Fecha</th>
@@ -249,25 +253,33 @@ export default function VehicleDetailPage() {
             <tbody>
               {fuelLogs.map((f) => (
                 <tr key={f.id}>
-                  <td>{f.fecha}</td>
-                  <td>{fuelTipoLabel(f.tipo_combustible)}</td>
-                  <td>{f.kilometraje.toLocaleString("es-AR")} km</td>
-                  <td>{Number(f.litros).toLocaleString("es-AR")} l</td>
-                  <td>${Number(f.costo_total).toLocaleString("es-AR")}</td>
-                  <td>
+                  <td data-label="Fecha">{f.fecha}</td>
+                  <td data-label="Tipo">{fuelTipoLabel(f.tipo_combustible)}</td>
+                  <td data-label="Km">{f.kilometraje.toLocaleString("es-AR")} km</td>
+                  <td data-label="Litros">{Number(f.litros).toLocaleString("es-AR")} l</td>
+                  <td data-label="Costo">${Number(f.costo_total).toLocaleString("es-AR")}</td>
+                  <td data-label="$/litro">
                     $
                     {(Number(f.costo_total) / Number(f.litros)).toLocaleString("es-AR", {
                       maximumFractionDigits: 2,
                     })}
                   </td>
-                  <td>{f.estacion_servicio || "-"}</td>
-                  <td>{f.tanque_lleno ? "Sí" : "No"}</td>
-                  <td>{f.rendimiento_km_l !== null ? `${f.rendimiento_km_l} km/l` : "-"}</td>
-                  <td>
-                    <Link to={`/vehiculos/${vehicle.id}/combustible/${f.id}/editar`}>Editar</Link>
-                    {" · "}
+                  <td data-label="Estación" className="hide-mobile">
+                    {f.estacion_servicio || "-"}
+                  </td>
+                  <td data-label="Tanque lleno" className="hide-mobile">
+                    {f.tanque_lleno ? "Sí" : "No"}
+                  </td>
+                  <td data-label="Rendimiento">
+                    {f.rendimiento_km_l !== null ? `${f.rendimiento_km_l} km/l` : "-"}
+                  </td>
+                  <td className="actions-cell">
+                    <Link to={`/vehiculos/${vehicle.id}/combustible/${f.id}/editar`} className="action-btn">
+                      Editar
+                    </Link>
                     <a
                       href="#"
+                      className="action-btn danger"
                       onClick={(e) => {
                         e.preventDefault();
                         handleDeleteFuelLog(f.id);

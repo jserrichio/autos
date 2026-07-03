@@ -60,7 +60,7 @@ export default function VehicleListPage() {
       ) : vehicles.length === 0 ? (
         <p>No hay vehículos cargados todavía.</p>
       ) : (
-        <table>
+        <table className="rtable">
           <thead>
             <tr>
               <th>Alias</th>
@@ -75,17 +75,21 @@ export default function VehicleListPage() {
           <tbody>
             {vehicles.map((v) => (
               <tr key={v.id}>
-                <td>
+                <td data-label="Alias">
                   <Link to={`/vehiculos/${v.id}`}>{v.alias || `${v.marca} ${v.modelo}`}</Link>
                 </td>
-                <td>
+                <td data-label="Marca / Modelo">
                   {v.marca} {v.modelo}
                 </td>
-                <td>{v.anio}</td>
-                <td>{v.patente}</td>
-                <td>{v.kilometraje_actual.toLocaleString("es-AR")} km</td>
-                {user?.is_admin && <td>{ownerLabel(v.owner_id)}</td>}
-                <td>{v.activo ? "Activo" : "Dado de baja"}</td>
+                <td data-label="Año">{v.anio}</td>
+                <td data-label="Patente">{v.patente}</td>
+                <td data-label="Kilometraje">{v.kilometraje_actual.toLocaleString("es-AR")} km</td>
+                {user?.is_admin && (
+                  <td data-label="Dueño" className="hide-mobile">
+                    {ownerLabel(v.owner_id)}
+                  </td>
+                )}
+                <td data-label="Estado">{v.activo ? "Activo" : "Dado de baja"}</td>
               </tr>
             ))}
           </tbody>
