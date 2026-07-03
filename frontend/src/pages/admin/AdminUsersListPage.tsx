@@ -92,7 +92,7 @@ export default function AdminUsersListPage() {
                       handleResetPassword(u);
                     }}
                   >
-                    Resetear contraseña
+                    Cambiar contraseña
                   </a>
                   {u.id !== currentUser?.id && (
                     <>
