@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
 from app.models import TipoCombustible, TipoTarea
 
@@ -22,6 +22,7 @@ class Token(BaseModel):
 
 class UserCreate(BaseModel):
     username: str
+    email: EmailStr
     password: str
     full_name: str | None = None
 
@@ -31,6 +32,7 @@ class UserOut(BaseModel):
 
     id: int
     username: str
+    email: str
     full_name: str | None
     is_active: bool
     is_admin: bool
@@ -38,6 +40,7 @@ class UserOut(BaseModel):
 
 class UserUpdate(BaseModel):
     username: str
+    email: EmailStr
     full_name: str | None = None
 
     _blank_full_name = field_validator("full_name", mode="before")(blank_to_none)

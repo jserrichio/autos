@@ -9,6 +9,7 @@ from app.models import User
 
 def main() -> None:
     username = input("Usuario: ").strip()
+    email = input("Email: ").strip()
     password = getpass.getpass("Contraseña: ")
     full_name = input("Nombre completo (opcional): ").strip() or None
     is_admin = input("¿Es administrador? (s/n): ").strip().lower() == "s"
@@ -18,8 +19,12 @@ def main() -> None:
         if db.query(User).filter(User.username == username).first():
             print(f"El usuario '{username}' ya existe.")
             return
+        if db.query(User).filter(User.email == email).first():
+            print(f"Ya existe un usuario con el email '{email}'.")
+            return
         user = User(
             username=username,
+            email=email,
             hashed_password=hash_password(password),
             full_name=full_name,
             is_admin=is_admin,

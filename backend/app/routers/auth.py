@@ -30,8 +30,12 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.username == user_in.username).first()
     if existing is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El usuario ya existe")
+    existing_email = db.query(User).filter(User.email == user_in.email).first()
+    if existing_email is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ese email ya está registrado")
     user = User(
         username=user_in.username,
+        email=user_in.email,
         hashed_password=hash_password(user_in.password),
         full_name=user_in.full_name,
     )

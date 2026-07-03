@@ -6,6 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 
 interface RegisterFormValues {
   username: string;
+  email: string;
   full_name: string;
   password: string;
 }
@@ -23,7 +24,7 @@ export default function RegisterPage() {
   async function onSubmit(values: RegisterFormValues) {
     setError(null);
     try {
-      await registerUser(values.username, values.password, values.full_name || null);
+      await registerUser(values.username, values.email, values.password, values.full_name || null);
       await login(values.username, values.password);
       navigate("/", { replace: true });
     } catch (err: unknown) {
@@ -42,6 +43,10 @@ export default function RegisterPage() {
           <label>
             Usuario
             <input {...register("username", { required: true })} autoFocus />
+          </label>
+          <label>
+            Email
+            <input type="email" {...register("email", { required: true })} />
           </label>
           <label>
             Nombre completo (opcional)

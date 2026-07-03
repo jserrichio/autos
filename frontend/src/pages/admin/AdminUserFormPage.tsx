@@ -5,6 +5,7 @@ import { fetchAdminUsers, registerUser, updateAdminUser } from "../../api/client
 
 interface FormValues {
   username: string;
+  email: string;
   full_name: string;
   password: string;
 }
@@ -25,7 +26,7 @@ export default function AdminUserFormPage() {
     if (isEdit) {
       fetchAdminUsers().then((users) => {
         const u = users.find((x) => x.id === Number(id));
-        if (u) reset({ username: u.username, full_name: u.full_name ?? "", password: "" });
+        if (u) reset({ username: u.username, email: u.email, full_name: u.full_name ?? "", password: "" });
       });
     }
   }, [id, isEdit, reset]);
@@ -36,10 +37,11 @@ export default function AdminUserFormPage() {
       if (isEdit) {
         await updateAdminUser(Number(id), {
           username: values.username,
+          email: values.email,
           full_name: values.full_name || null,
         });
       } else {
-        await registerUser(values.username, values.password, values.full_name || null);
+        await registerUser(values.username, values.email, values.password, values.full_name || null);
       }
       navigate("/admin/usuarios");
     } catch (err: unknown) {
@@ -57,6 +59,10 @@ export default function AdminUserFormPage() {
         <label>
           Usuario
           <input {...register("username", { required: true })} />
+        </label>
+        <label>
+          Email
+          <input type="email" {...register("email", { required: true })} />
         </label>
         <label>
           Nombre completo

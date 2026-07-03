@@ -27,7 +27,11 @@ def update_user(user_id: int, user_in: UserUpdate, db: Session = Depends(get_db)
     duplicate = db.query(User).filter(User.username == user_in.username, User.id != user_id).first()
     if duplicate:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ya existe un usuario con ese nombre")
+    duplicate_email = db.query(User).filter(User.email == user_in.email, User.id != user_id).first()
+    if duplicate_email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Ese email ya está registrado")
     user.username = user_in.username
+    user.email = user_in.email
     user.full_name = user_in.full_name
     db.commit()
     db.refresh(user)

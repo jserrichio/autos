@@ -45,9 +45,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    const publicPaths = ["/login", "/registro"];
     if (error.response?.status === 401) {
       clearToken();
-      if (window.location.pathname !== "/login") {
+      if (!publicPaths.includes(window.location.pathname)) {
         window.location.href = "/login";
       }
     }
@@ -72,11 +73,13 @@ export async function fetchMe(): Promise<User> {
 
 export async function registerUser(
   username: string,
+  email: string,
   password: string,
   fullName: string | null,
 ): Promise<User> {
   const { data } = await api.post<User>("/auth/register", {
     username,
+    email,
     password,
     full_name: fullName,
   });

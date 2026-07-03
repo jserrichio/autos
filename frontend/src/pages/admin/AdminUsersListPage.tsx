@@ -69,6 +69,7 @@ export default function AdminUsersListPage() {
           <thead>
             <tr>
               <th>Usuario</th>
+              <th>Email</th>
               <th>Nombre</th>
               <th>Admin</th>
               <th>Estado</th>
@@ -79,6 +80,7 @@ export default function AdminUsersListPage() {
             {users.map((u) => (
               <tr key={u.id}>
                 <td>{u.username}</td>
+                <td>{u.email}</td>
                 <td>{u.full_name || "-"}</td>
                 <td>{u.is_admin ? "Sí" : "No"}</td>
                 <td>{u.is_active ? "Activo" : "Desactivado"}</td>

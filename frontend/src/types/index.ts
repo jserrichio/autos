@@ -15,6 +15,7 @@ export type TipoTarea =
 export interface User {
   id: number;
   username: string;
+  email: string;
   full_name: string | null;
   is_active: boolean;
   is_admin: boolean;
@@ -88,6 +89,7 @@ export interface TaskType {
 
 export interface UserUpdateInput {
   username: string;
+  email: string;
   full_name: string | null;
 }
 
