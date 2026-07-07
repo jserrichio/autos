@@ -5,7 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
-from app.models import TIPO_TAREA_LABELS, MaintenanceTask, TipoTarea, User, Vehicle
+from app.models import MaintenanceTask, TaskType, User, Vehicle
 from app.schemas import UpcomingItem
 
 router = APIRouter(prefix="/api/dashboard", tags=["dashboard"], dependencies=[Depends(get_current_user)])
@@ -42,6 +42,7 @@ def compute_upcoming_items(
         latest_tasks_query = latest_tasks_query.join(Vehicle).filter(Vehicle.owner_id == current_user.id)
     latest_tasks = latest_tasks_query.all()
 
+    tipo_labels = {t.slug: t.label for t in db.query(TaskType).all()}
     today = date.today()
     results: list[UpcomingItem] = []
 
@@ -79,13 +80,12 @@ def compute_upcoming_items(
         else:
             continue
 
-        tipo = TipoTarea(task.tipo)
         results.append(
             UpcomingItem(
                 vehicle_id=vehicle.id,
                 vehicle_label=f"{vehicle.marca} {vehicle.modelo} ({vehicle.patente})",
-                tipo=tipo,
-                tipo_label=TIPO_TAREA_LABELS[tipo],
+                tipo=task.tipo,
+                tipo_label=tipo_labels.get(task.tipo, task.tipo),
                 estado=estado,
                 proximo_fecha_estimada=task.proximo_fecha_estimada,
                 proximo_km_estimado=task.proximo_km_estimado,

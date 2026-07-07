@@ -19,6 +19,9 @@ export default function Header() {
           <li>
             <Link to="/vehiculos">Vehículos</Link>
           </li>
+          <li>
+            <Link to="/tipos-tarea">Tipos de tarea</Link>
+          </li>
           {user?.is_admin && (
             <li>
               <Link to="/admin/usuarios">Admin</Link>

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
-from app.models import TIPO_TAREA_LABELS, FuelLog, MaintenanceTask, TipoTarea, User
+from app.models import FuelLog, MaintenanceTask, TaskType, User
 from app.routers.vehicles import _get_vehicle_or_404
 from app.schemas import (
     GastoPorAnio,
@@ -29,13 +29,14 @@ def get_vehicle_stats(vehicle_id: int, db: Session = Depends(get_db), current_us
     # --- Gasto de mantenimiento ---
     gasto_mantenimiento_total = sum((t.costo for t in tasks if t.costo is not None), Decimal("0"))
 
+    tipo_labels = {t.slug: t.label for t in db.query(TaskType).all()}
     gasto_por_tipo_dict: dict[str, Decimal] = defaultdict(lambda: Decimal("0"))
     for t in tasks:
         if t.costo is not None:
             gasto_por_tipo_dict[t.tipo] += t.costo
     gasto_mantenimiento_por_tipo = sorted(
         (
-            GastoPorTipo(tipo=tipo, tipo_label=TIPO_TAREA_LABELS[TipoTarea(tipo)], total=total)
+            GastoPorTipo(tipo=tipo, tipo_label=tipo_labels.get(tipo, tipo), total=total)
             for tipo, total in gasto_por_tipo_dict.items()
         ),
         key=lambda g: g.total,

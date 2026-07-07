@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchUpcoming } from "../api/client";
-import type { UpcomingItem } from "../types";
+import { fetchUpcoming, fetchVehicles } from "../api/client";
+import type { UpcomingItem, Vehicle } from "../types";
 
 export default function DashboardPage() {
   const [items, setItems] = useState<UpcomingItem[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [vehiclesLoading, setVehiclesLoading] = useState(true);
 
   useEffect(() => {
     fetchUpcoming()
       .then(setItems)
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetchVehicles()
+      .then(setVehicles)
+      .finally(() => setVehiclesLoading(false));
   }, []);
 
   const vencidos = items.filter((i) => i.estado === "vencido");
@@ -19,6 +27,42 @@ export default function DashboardPage() {
   return (
     <main className="container">
       <h1>Dashboard</h1>
+
+      <section style={{ marginBottom: "1.5rem" }}>
+        <h2>Mis vehículos</h2>
+        {vehiclesLoading ? (
+          <p>Cargando...</p>
+        ) : vehicles.length === 0 ? (
+          <p>
+            No hay vehículos cargados todavía. <Link to="/vehiculos/nuevo">Agregar uno</Link>.
+          </p>
+        ) : (
+          <div className="vehicle-cards">
+            {vehicles.map((v) => (
+              <article key={v.id} style={{ marginBottom: 0 }}>
+                <header>
+                  <Link to={`/vehiculos/${v.id}`}>
+                    <strong>{v.alias || `${v.marca} ${v.modelo}`}</strong>
+                  </Link>
+                </header>
+                <p style={{ marginBottom: "0.5rem" }}>
+                  <small>
+                    {v.patente} · {v.kilometraje_actual.toLocaleString("es-AR")} km
+                  </small>
+                </p>
+                <div className="grid">
+                  <Link to={`/vehiculos/${v.id}/combustible/nueva`} role="button" className="secondary">
+                    ⛽ Combustible
+                  </Link>
+                  <Link to={`/vehiculos/${v.id}/tareas/nueva`} role="button" className="secondary">
+                    🔧 Tarea
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
 
       {loading ? (
         <p>Cargando...</p>

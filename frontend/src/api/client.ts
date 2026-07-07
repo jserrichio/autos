@@ -8,6 +8,7 @@ import type {
   MaintenanceTask,
   MaintenanceTaskInput,
   TaskType,
+  TaskTypeInput,
   UpcomingItem,
   User,
   UserUpdateInput,
@@ -147,6 +148,20 @@ export async function reactivateVehicle(id: number): Promise<Vehicle> {
 export async function fetchTaskTypes(): Promise<TaskType[]> {
   const { data } = await api.get<TaskType[]>("/task-types");
   return data;
+}
+
+export async function createTaskType(input: TaskTypeInput): Promise<TaskType> {
+  const { data } = await api.post<TaskType>("/task-types", input);
+  return data;
+}
+
+export async function updateTaskType(id: number, input: TaskTypeInput): Promise<TaskType> {
+  const { data } = await api.put<TaskType>(`/task-types/${id}`, input);
+  return data;
+}
+
+export async function deleteTaskType(id: number): Promise<void> {
+  await api.delete(`/task-types/${id}`);
 }
 
 export async function fetchTasks(vehicleId: number): Promise<MaintenanceTask[]> {

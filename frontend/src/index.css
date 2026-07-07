@@ -75,3 +75,9 @@ nav {
   color: var(--pico-del-color);
   border-color: var(--pico-del-color);
 }
+
+.vehicle-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}

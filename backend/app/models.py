@@ -18,35 +18,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 
-class TipoTarea(str, enum.Enum):
-    CAMBIO_ACEITE = "cambio_aceite"
-    FILTRO_ACEITE = "filtro_aceite"
-    FILTRO_AIRE = "filtro_aire"
-    FILTRO_COMBUSTIBLE = "filtro_combustible"
-    FRENOS = "frenos"
-    NEUMATICOS = "neumaticos"
-    BATERIA = "bateria"
-    CORREA_DISTRIBUCION = "correa_distribucion"
-    REFRIGERANTE = "refrigerante"
-    REVISION_GENERAL = "revision_general"
-    ITV_VTV = "itv_vtv"
-    OTRO = "otro"
-
-
-TIPO_TAREA_LABELS: dict[TipoTarea, str] = {
-    TipoTarea.CAMBIO_ACEITE: "Cambio de aceite",
-    TipoTarea.FILTRO_ACEITE: "Filtro de aceite",
-    TipoTarea.FILTRO_AIRE: "Filtro de aire",
-    TipoTarea.FILTRO_COMBUSTIBLE: "Filtro de combustible",
-    TipoTarea.FRENOS: "Frenos / pastillas",
-    TipoTarea.NEUMATICOS: "Neumáticos / alineación",
-    TipoTarea.BATERIA: "Batería",
-    TipoTarea.CORREA_DISTRIBUCION: "Correa de distribución",
-    TipoTarea.REFRIGERANTE: "Refrigerante",
-    TipoTarea.REVISION_GENERAL: "Revisión general / service",
-    TipoTarea.ITV_VTV: "ITV / VTV (revisión técnica)",
-    TipoTarea.OTRO: "Otro",
-}
+TIPO_OTRO_SLUG = "otro"
 
 
 class TipoCombustible(str, enum.Enum):
@@ -64,6 +36,20 @@ TIPO_COMBUSTIBLE_LABELS: dict[TipoCombustible, str] = {
     TipoCombustible.GNC: "GNC",
     TipoCombustible.OTRO: "Otro",
 }
+
+
+class TaskType(Base):
+    __tablename__ = "task_types"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(40), unique=True, nullable=False, index=True)
+    label: Mapped[str] = mapped_column(String(100), nullable=False)
+    permite_recordatorio: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    es_protegido: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    intervalo_km: Mapped[int | None] = mapped_column(Integer)
+    intervalo_meses: Mapped[int | None] = mapped_column(Integer)
+    created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class User(Base):

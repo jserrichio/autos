@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   createTask,
   deleteAttachment,
   downloadAttachment,
   fetchTask,
   fetchTaskTypes,
+  fetchVehicle,
   updateTask,
   uploadAttachment,
 } from "../api/client";
@@ -40,16 +41,38 @@ export default function MaintenanceTaskFormPage() {
     handleSubmit,
     reset,
     watch,
+    getValues,
+    setValue,
     formState: { isSubmitting },
   } = useForm<FormValues>({
     defaultValues: { tipo: "cambio_aceite", fecha: new Date().toISOString().slice(0, 10) },
   });
 
   const tipoSeleccionado = watch("tipo");
+  const tipoInfo = taskTypes.find((t) => t.value === tipoSeleccionado);
+  const admiteRecordatorio = tipoInfo?.permite_recordatorio ?? true;
+
+  const [typesLoaded, setTypesLoaded] = useState(false);
+  const [taskLoaded, setTaskLoaded] = useState(!isEdit);
+  const [vehicleReady, setVehicleReady] = useState(isEdit);
+  const readyRef = useRef(false);
+  const lastTipoRef = useRef<string | null>(null);
 
   useEffect(() => {
-    fetchTaskTypes().then(setTaskTypes);
+    fetchTaskTypes().then((types) => {
+      setTaskTypes(types);
+      setTypesLoaded(true);
+    });
   }, []);
+
+  useEffect(() => {
+    if (!isEdit) {
+      fetchVehicle(vehicleId).then((v) => {
+        setValue("kilometraje", v.kilometraje_actual);
+        setVehicleReady(true);
+      });
+    }
+  }, [isEdit, vehicleId, setValue]);
 
   useEffect(() => {
     if (isEdit) {
@@ -67,9 +90,51 @@ export default function MaintenanceTaskFormPage() {
           proximo_km_estimado: t.proximo_km_estimado,
         });
         setAttachments(t.attachments);
+        setTaskLoaded(true);
       });
     }
   }, [isEdit, taskId, reset]);
+
+  // Precarga el recordatorio con el intervalo configurado para el tipo elegido.
+  // Al editar una tarea existente, no pisa el recordatorio ya guardado a menos
+  // que el usuario cambie el tipo explícitamente.
+  useEffect(() => {
+    if (!typesLoaded || !taskLoaded || !vehicleReady) return;
+    const firstRun = !readyRef.current;
+    readyRef.current = true;
+
+    if (firstRun) {
+      lastTipoRef.current = tipoSeleccionado;
+      if (isEdit) return;
+    } else if (tipoSeleccionado === lastTipoRef.current) {
+      return;
+    } else {
+      lastTipoRef.current = tipoSeleccionado;
+    }
+
+    const info = taskTypes.find((t) => t.value === tipoSeleccionado);
+    if (!info || !info.permite_recordatorio) return;
+
+    let nextFecha = "";
+    if (info.intervalo_meses != null) {
+      const fechaVal = getValues("fecha");
+      if (fechaVal) {
+        const d = new Date(fechaVal);
+        d.setMonth(d.getMonth() + info.intervalo_meses);
+        nextFecha = d.toISOString().slice(0, 10);
+      }
+    }
+    setValue("proximo_fecha_estimada", nextFecha);
+
+    let nextKm: number | null = null;
+    if (info.intervalo_km != null) {
+      const kmVal = Number(getValues("kilometraje"));
+      if (kmVal > 0) {
+        nextKm = kmVal + info.intervalo_km;
+      }
+    }
+    setValue("proximo_km_estimado", nextKm);
+  }, [tipoSeleccionado, typesLoaded, taskLoaded, vehicleReady, taskTypes, isEdit, getValues, setValue]);
 
   async function onSubmit(values: FormValues) {
     setError(null);
@@ -82,9 +147,11 @@ export default function MaintenanceTaskFormPage() {
       notas: values.notas || null,
       taller_nombre: values.taller_nombre || null,
       taller_contacto: values.taller_contacto || null,
-      proximo_fecha_estimada: values.proximo_fecha_estimada || null,
+      proximo_fecha_estimada: admiteRecordatorio ? values.proximo_fecha_estimada || null : null,
       proximo_km_estimado:
-        values.proximo_km_estimado === null || (values.proximo_km_estimado as unknown as string) === ""
+        !admiteRecordatorio ||
+        values.proximo_km_estimado === null ||
+        (values.proximo_km_estimado as unknown as string) === ""
           ? null
           : Number(values.proximo_km_estimado),
     };
@@ -136,6 +203,13 @@ export default function MaintenanceTaskFormPage() {
             ))}
           </select>
         </label>
+        <p>
+          <small>
+            <Link to="/tipos-tarea" target="_blank">
+              Gestionar tipos de tarea
+            </Link>
+          </small>
+        </p>
 
         {tipoSeleccionado === "otro" && (
           <label>
@@ -171,19 +245,28 @@ export default function MaintenanceTaskFormPage() {
           </label>
         </div>
 
-        <fieldset>
-          <legend>Recordatorio de próximo mantenimiento (opcional)</legend>
-          <div className="grid">
-            <label>
-              Próxima fecha estimada
-              <input type="date" {...register("proximo_fecha_estimada")} />
-            </label>
-            <label>
-              Próximo km estimado
-              <input type="number" {...register("proximo_km_estimado", { valueAsNumber: true })} />
-            </label>
-          </div>
-        </fieldset>
+        {admiteRecordatorio ? (
+          <fieldset>
+            <legend>Recordatorio de próximo mantenimiento (opcional)</legend>
+            <div className="grid">
+              <label>
+                Próxima fecha estimada
+                <input type="date" {...register("proximo_fecha_estimada")} />
+              </label>
+              <label>
+                Próximo km estimado
+                <input type="number" {...register("proximo_km_estimado", { valueAsNumber: true })} />
+              </label>
+            </div>
+          </fieldset>
+        ) : (
+          <p>
+            <small>
+              El tipo "{tipoInfo?.label}" no admite recordatorio de próximo mantenimiento. Si necesitás uno,
+              creá un tipo de tarea específico.
+            </small>
+          </p>
+        )}
 
         <label>
           Notas

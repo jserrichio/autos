@@ -1,16 +1,4 @@
-export type TipoTarea =
-  | "cambio_aceite"
-  | "filtro_aceite"
-  | "filtro_aire"
-  | "filtro_combustible"
-  | "frenos"
-  | "neumaticos"
-  | "bateria"
-  | "correa_distribucion"
-  | "refrigerante"
-  | "revision_general"
-  | "itv_vtv"
-  | "otro";
+export type TipoTarea = string;
 
 export interface User {
   id: number;
@@ -83,8 +71,19 @@ export type MaintenanceTaskInput = {
 };
 
 export interface TaskType {
+  id: number;
   value: TipoTarea;
   label: string;
+  permite_recordatorio: boolean;
+  es_protegido: boolean;
+  intervalo_km: number | null;
+  intervalo_meses: number | null;
+}
+
+export interface TaskTypeInput {
+  label: string;
+  intervalo_km: number | null;
+  intervalo_meses: number | null;
 }
 
 export interface UserUpdateInput {

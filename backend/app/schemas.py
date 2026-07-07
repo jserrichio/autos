@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
-from app.models import TipoCombustible, TipoTarea
+from app.models import TipoCombustible
 
 
 def blank_to_none(value: str | None) -> str | None:
@@ -95,7 +95,7 @@ class VehicleOut(BaseModel):
 
 
 class MaintenanceTaskCreate(BaseModel):
-    tipo: TipoTarea
+    tipo: str
     tipo_otro_texto: str | None = None
     fecha: date
     kilometraje: int
@@ -131,7 +131,7 @@ class MaintenanceTaskOut(BaseModel):
 
     id: int
     vehicle_id: int
-    tipo: TipoTarea
+    tipo: str
     tipo_otro_texto: str | None
     fecha: date
     kilometraje: int
@@ -147,14 +147,31 @@ class MaintenanceTaskOut(BaseModel):
 
 
 class TaskTypeOut(BaseModel):
+    id: int
     value: str
     label: str
+    permite_recordatorio: bool
+    es_protegido: bool
+    intervalo_km: int | None
+    intervalo_meses: int | None
+
+
+class TaskTypeCreate(BaseModel):
+    label: str
+    intervalo_km: int | None = None
+    intervalo_meses: int | None = None
+
+
+class TaskTypeUpdate(BaseModel):
+    label: str
+    intervalo_km: int | None = None
+    intervalo_meses: int | None = None
 
 
 class UpcomingItem(BaseModel):
     vehicle_id: int
     vehicle_label: str
-    tipo: TipoTarea
+    tipo: str
     tipo_label: str
     estado: str  # "vencido" | "proximo" | "ok"
     proximo_fecha_estimada: date | None

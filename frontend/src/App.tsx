@@ -8,6 +8,7 @@ import FuelLogFormPage from "./pages/FuelLogFormPage";
 import LoginPage from "./pages/LoginPage";
 import MaintenanceTaskFormPage from "./pages/MaintenanceTaskFormPage";
 import RegisterPage from "./pages/RegisterPage";
+import TaskTypesPage from "./pages/TaskTypesPage";
 import VehicleDetailPage from "./pages/VehicleDetailPage";
 import VehicleFormPage from "./pages/VehicleFormPage";
 import VehicleListPage from "./pages/VehicleListPage";
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/vehiculos/:id/combustible/nueva" element={<FuelLogFormPage />} />
             <Route path="/vehiculos/:id/combustible/:fuelLogId/editar" element={<FuelLogFormPage />} />
             <Route path="/vehiculos/:id/estadisticas" element={<VehicleStatsPage />} />
+            <Route path="/tipos-tarea" element={<TaskTypesPage />} />
             <Route element={<AdminRoute />}>
               <Route path="/admin/usuarios" element={<AdminUsersListPage />} />
               <Route path="/admin/usuarios/nuevo" element={<AdminUserFormPage />} />
