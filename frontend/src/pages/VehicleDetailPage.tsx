@@ -9,9 +9,22 @@ import {
   fetchTasks,
   fetchTaskTypes,
   fetchVehicle,
+  fetchVehicleUpcoming,
   reactivateVehicle,
 } from "../api/client";
-import type { FuelLog, FuelType, MaintenanceTask, TaskType, Vehicle } from "../types";
+import type { FuelLog, FuelType, MaintenanceTask, TaskType, UpcomingItem, Vehicle } from "../types";
+
+const ESTADO_COLOR: Record<UpcomingItem["estado"], string> = {
+  vencido: "var(--pico-del-color)",
+  proximo: "oklch(55% 0.15 70)",
+  ok: "var(--pico-muted-color)",
+};
+
+const ESTADO_LABEL: Record<UpcomingItem["estado"], string> = {
+  vencido: "Vencido",
+  proximo: "Próximo",
+  ok: "Al día",
+};
 
 export default function VehicleDetailPage() {
   const { id } = useParams();
@@ -23,6 +36,7 @@ export default function VehicleDetailPage() {
   const [fuelLogs, setFuelLogs] = useState<FuelLog[]>([]);
   const [consumoPromedio, setConsumoPromedio] = useState<number | null>(null);
   const [fuelTypes, setFuelTypes] = useState<FuelType[]>([]);
+  const [upcoming, setUpcoming] = useState<UpcomingItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   function reload() {
@@ -33,14 +47,16 @@ export default function VehicleDetailPage() {
       fetchTaskTypes(),
       fetchFuelLogs(vehicleId),
       fetchFuelTypes(),
+      fetchVehicleUpcoming(vehicleId),
     ])
-      .then(([v, t, tt, fl, ft]) => {
+      .then(([v, t, tt, fl, ft, up]) => {
         setVehicle(v);
         setTasks(t);
         setTaskTypes(tt);
         setFuelLogs(fl.items);
         setConsumoPromedio(fl.consumo_promedio_km_l);
         setFuelTypes(ft);
+        setUpcoming(up);
       })
       .finally(() => setLoading(false));
   }
@@ -148,6 +164,38 @@ export default function VehicleDetailPage() {
           </p>
         )}
       </article>
+
+      <h2>Próximos mantenimientos</h2>
+
+      {upcoming.length === 0 ? (
+        <p>No hay próximos mantenimientos estimados.</p>
+      ) : (
+        <table className="rtable">
+          <thead>
+            <tr>
+              <th>Tarea</th>
+              <th>Estado</th>
+              <th>Estimado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {upcoming.map((item, idx) => (
+              <tr key={idx}>
+                <td data-label="Tarea">{item.tipo_label}</td>
+                <td data-label="Estado">
+                  <strong style={{ color: ESTADO_COLOR[item.estado] }}>{ESTADO_LABEL[item.estado]}</strong>
+                </td>
+                <td data-label="Estimado">
+                  {item.proximo_fecha_estimada && `Fecha: ${item.proximo_fecha_estimada}`}
+                  {item.proximo_fecha_estimada && item.proximo_km_estimado && " · "}
+                  {item.proximo_km_estimado &&
+                    `Km: ${item.proximo_km_estimado.toLocaleString("es-AR")} (actual: ${item.kilometraje_actual.toLocaleString("es-AR")})`}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <nav>
         <ul>

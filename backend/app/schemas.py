@@ -156,7 +156,7 @@ class UpcomingItem(BaseModel):
     vehicle_label: str
     tipo: TipoTarea
     tipo_label: str
-    estado: str  # "vencido" | "proximo"
+    estado: str  # "vencido" | "proximo" | "ok"
     proximo_fecha_estimada: date | None
     proximo_km_estimado: int | None
     kilometraje_actual: int

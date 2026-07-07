@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
 from app.models import User, Vehicle
-from app.schemas import VehicleCreate, VehicleOut, VehicleUpdate
+from app.routers.dashboard import compute_upcoming_items
+from app.schemas import UpcomingItem, VehicleCreate, VehicleOut, VehicleUpdate
 
 router = APIRouter(prefix="/api/vehicles", tags=["vehicles"], dependencies=[Depends(get_current_user)])
 
@@ -63,6 +64,14 @@ def _get_vehicle_or_404(vehicle_id: int, db: Session, current_user: User) -> Veh
 @router.get("/{vehicle_id}", response_model=VehicleOut)
 def get_vehicle(vehicle_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return _get_vehicle_or_404(vehicle_id, db, current_user)
+
+
+@router.get("/{vehicle_id}/upcoming", response_model=list[UpcomingItem])
+def get_vehicle_upcoming(
+    vehicle_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    _get_vehicle_or_404(vehicle_id, db, current_user)
+    return compute_upcoming_items(db, current_user, vehicle_id=vehicle_id, include_ok=True)
 
 
 @router.put("/{vehicle_id}", response_model=VehicleOut)

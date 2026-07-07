@@ -98,7 +98,7 @@ export interface UpcomingItem {
   vehicle_label: string;
   tipo: TipoTarea;
   tipo_label: string;
-  estado: "vencido" | "proximo";
+  estado: "vencido" | "proximo" | "ok";
   proximo_fecha_estimada: string | null;
   proximo_km_estimado: number | null;
   kilometraje_actual: number;

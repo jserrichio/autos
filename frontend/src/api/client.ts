@@ -236,6 +236,11 @@ export async function fetchUpcoming(): Promise<UpcomingItem[]> {
   return data;
 }
 
+export async function fetchVehicleUpcoming(vehicleId: number): Promise<UpcomingItem[]> {
+  const { data } = await api.get<UpcomingItem[]>(`/vehicles/${vehicleId}/upcoming`);
+  return data;
+}
+
 export async function fetchVehicleStats(vehicleId: number): Promise<VehicleStats> {
   const { data } = await api.get<VehicleStats>(`/vehicles/${vehicleId}/stats`);
   return data;

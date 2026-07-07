@@ -14,8 +14,12 @@ PROXIMO_DIAS_VENTANA = 30
 PROXIMO_KM_VENTANA = 1000
 
 
-@router.get("/upcoming", response_model=list[UpcomingItem])
-def upcoming(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def compute_upcoming_items(
+    db: Session,
+    current_user: User,
+    vehicle_id: int | None = None,
+    include_ok: bool = False,
+) -> list[UpcomingItem]:
     latest_dates = (
         db.query(
             MaintenanceTask.vehicle_id,
@@ -32,6 +36,8 @@ def upcoming(db: Session = Depends(get_db), current_user: User = Depends(get_cur
         & (MaintenanceTask.tipo == latest_dates.c.tipo)
         & (MaintenanceTask.fecha == latest_dates.c.max_fecha),
     )
+    if vehicle_id is not None:
+        latest_tasks_query = latest_tasks_query.filter(MaintenanceTask.vehicle_id == vehicle_id)
     if not current_user.is_admin:
         latest_tasks_query = latest_tasks_query.join(Vehicle).filter(Vehicle.owner_id == current_user.id)
     latest_tasks = latest_tasks_query.all()
@@ -68,6 +74,8 @@ def upcoming(db: Session = Depends(get_db), current_user: User = Depends(get_cur
             estado = "vencido"
         elif proximo_por_fecha or proximo_por_km:
             estado = "proximo"
+        elif include_ok:
+            estado = "ok"
         else:
             continue
 
@@ -85,5 +93,11 @@ def upcoming(db: Session = Depends(get_db), current_user: User = Depends(get_cur
             )
         )
 
-    results.sort(key=lambda item: (item.estado != "vencido", item.vehicle_label))
+    estado_orden = {"vencido": 0, "proximo": 1, "ok": 2}
+    results.sort(key=lambda item: (estado_orden[item.estado], item.vehicle_label))
     return results
+
+
+@router.get("/upcoming", response_model=list[UpcomingItem])
+def upcoming(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return compute_upcoming_items(db, current_user)
