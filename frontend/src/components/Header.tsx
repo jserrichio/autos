@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import ThemeToggle from "../theme/ThemeToggle";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -29,6 +30,9 @@ export default function Header() {
           )}
         </ul>
         <ul>
+          <li>
+            <ThemeToggle />
+          </li>
           {user && (
             <>
               <li>{user.full_name ?? user.username}</li>

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
+import ThemeToggle from "../theme/ThemeToggle";
 
 interface RegisterFormValues {
   username: string;
@@ -37,6 +38,9 @@ export default function RegisterPage() {
 
   return (
     <main className="container" style={{ maxWidth: "420px" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <ThemeToggle />
+      </div>
       <article>
         <h1>Crear cuenta</h1>
         <form onSubmit={handleSubmit(onSubmit)}>

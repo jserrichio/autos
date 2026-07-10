@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import ThemeToggle from "../theme/ThemeToggle";
 
 interface LoginFormValues {
   username: string;
@@ -32,6 +33,9 @@ export default function LoginPage() {
 
   return (
     <main className="container" style={{ maxWidth: "420px" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <ThemeToggle />
+      </div>
       <article>
         <h1>Iniciar sesión</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
